@@ -1,5 +1,6 @@
 [package]
 name = "slang-sys"
+description = "FFI bindings to slang"
 version = "0.1.0"
 authors = ["Michael Tang <tangmi@uw.edu>"]
 edition = "2018"
