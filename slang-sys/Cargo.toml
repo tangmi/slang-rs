@@ -1,0 +1,14 @@
+[package]
+name = "slang-sys"
+version = "0.1.0"
+authors = ["Michael Tang <tangmi@uw.edu>"]
+edition = "2018"
+links = "slang"
+build = "build.rs"
+
+[build-dependencies]
+bindgen = "0.48"
+cfg-if = "0.1"
+curl = "0.4"
+url = "1.7"
+zip = "0.5"

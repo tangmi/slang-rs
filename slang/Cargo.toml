@@ -1,0 +1,8 @@
+[package]
+name = "slang"
+version = "0.1.0"
+authors = ["Michael Tang <tangmi@uw.edu>"]
+edition = "2018"
+
+[dependencies]
+slang-sys = { path = "../slang-sys" }
