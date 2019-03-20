@@ -1,10 +1,10 @@
 [package]
 name = "slang-sys"
 description = "FFI bindings to slang"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Michael Tang <tangmi@uw.edu>"]
 license = "MIT/Apache-2.0"
-documentation = "https://docs.rs/slang-sys/0.1.0/"
+documentation = "https://docs.rs/slang-sys/0.1.1/"
 repository = "https://github.com/tangmi/slang-rs/"
 readme = "README.md"
 edition = "2018"
