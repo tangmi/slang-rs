@@ -1,7 +1,9 @@
 [package]
 name = "slang"
+description = "Safe Rust bindings for the Slang shader language compiler"
 version = "0.0.0"
 authors = ["Michael Tang <tangmi@uw.edu>"]
+license = "MIT/Apache-2.0"
 edition = "2018"
 
 [dependencies]
