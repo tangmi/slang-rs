@@ -1,5 +1,6 @@
 # `slang-rs`
 
-Safe Rust bindings for the [Slang](https://github.com/shader-slang/slang) shader language compiler.
+Provides the following crates:
 
-See [`./slang-sys/build.rs`](slang-sys/build.rs) for the current slang version.
+- `slang-sys`: FFI bindings to a release of [Slang](https://github.com/shader-slang/slang).
+- `slang`: Safe Rust wrapper to `slang-sys`.
