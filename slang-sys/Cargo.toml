@@ -1,15 +1,15 @@
 [package]
 name = "slang-sys"
-description = "FFI bindings to slang"
 version = "0.1.2"
 authors = ["Michael Tang <tangmi@uw.edu>"]
-license = "MIT/Apache-2.0"
-documentation = "https://docs.rs/slang-sys/0.1.2/"
-repository = "https://github.com/tangmi/slang-rs/"
-readme = "README.md"
-edition = "2018"
 links = "slang"
 build = "build.rs"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/tangmi/slang-rs/"
+documentation = "https://docs.rs/slang-sys/0.1.2/"
+description = "FFI bindings to slang"
+readme = "README.md"
+edition = "2018"
 
 [build-dependencies]
 bindgen = "0.48"

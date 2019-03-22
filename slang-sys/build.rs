@@ -14,6 +14,7 @@ use url::Url;
 struct SlangReleaseInfo {
     url: &'static str,
     relative_path_to_binaries: &'static str,
+    static_libs: &'static [&'static str],
 }
 
 cfg_if! {
@@ -21,16 +22,19 @@ cfg_if! {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
             url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-win32.zip",
             relative_path_to_binaries: "bin/windows-x86/release/",
+            static_libs: &["slang"],
         };
     } else if #[cfg(all(target_os = "windows", target_arch = "x86_64"))] {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
             url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-win64.zip",
             relative_path_to_binaries: "bin/windows-x64/release/",
+            static_libs: &["slang"],
         };
     } else if #[cfg(all(target_os = "linux", target_arch = "x86_64"))] {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
             url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-linux-x86_64.zip",
             relative_path_to_binaries: "bin/linux-x64/release/",
+            static_libs: &[],
         };
     } else {
         compile_error!("No official release for the current platform! See: https://github.com/shader-slang/slang/releases/tag/v0.12.4");
@@ -61,12 +65,15 @@ fn main() {
 
     generate_bindings(&extract_dir);
 
-    let slang_binaries_path = extract_dir.join(SLANG_RELEASE.relative_path_to_binaries);
-    println!(
-        "cargo:rustc-link-search={}",
-        fs::canonicalize(&slang_binaries_path).unwrap().display()
-    );
-    println!("cargo:rustc-link-lib=static=slang");
+    // emit cargo metadata
+    {
+        let slang_binaries_path = extract_dir.join(SLANG_RELEASE.relative_path_to_binaries);
+        println!("cargo:rustc-link-search={}", slang_binaries_path.display());
+
+        for static_lib in SLANG_RELEASE.static_libs {
+            println!("cargo:rustc-link-lib=static={}", static_lib);
+        }
+    }
 }
 
 fn download(url: &url::Url, download_destination_path: &Path) -> Result<(), curl::Error> {
@@ -102,7 +109,7 @@ fn extract<R: Read + io::Seek>(
                     fs::create_dir_all(&p)?;
                 }
             }
-            
+
             let mut outfile = fs::File::create(&outpath)?;
             io::copy(&mut file, &mut outfile)?;
         }
