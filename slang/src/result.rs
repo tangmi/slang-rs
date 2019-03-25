@@ -34,10 +34,10 @@ const SLANG_E_NOT_FOUND: slang_sys::SlangResult = 0x82000005;
 const SLANG_E_INTERNAL_FAIL: slang_sys::SlangResult = 0x82000006;
 
 // TODO impl Display for SlangResult wrapper? can parse severity, facility, code
-pub type Result = ::std::result::Result<(), Error>;
+pub type Result<T> = ::std::result::Result<T, Error>;
 
 // TODO: unsure how to get a From<SlangResult> impl since I own neither SlangResult (i32) or Result
-pub fn into_result(slang_result: slang_sys::SlangResult) -> Result {
+pub fn into_result(slang_result: slang_sys::SlangResult) -> Result<()> {
     if slang_result == 0 {
         Ok(())
     } else {
