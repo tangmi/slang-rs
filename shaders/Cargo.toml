@@ -1,0 +1,10 @@
+[package]
+name = "shaders"
+version = "0.1.0"
+authors = ["Michael Tang <tangmi@uw.edu>"]
+edition = "2018"
+
+[dependencies]
+slang = { version = "0.0", path = "../slang" }
+spirv_cross = "0.12"
+gfx = "0.18"
