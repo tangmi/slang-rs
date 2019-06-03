@@ -20,24 +20,24 @@ struct SlangReleaseInfo {
 cfg_if! {
     if #[cfg(all(target_os = "windows", target_arch = "x86"))] {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
-            url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-win32.zip",
+            url: "https://github.com/shader-slang/slang/releases/download/v0.12.6/slang-0.12.6-win32.zip",
             relative_path_to_binaries: "bin/windows-x86/release/",
             static_libs: &["slang"],
         };
     } else if #[cfg(all(target_os = "windows", target_arch = "x86_64"))] {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
-            url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-win64.zip",
+            url: "https://github.com/shader-slang/slang/releases/download/v0.12.6/slang-0.12.6-win64.zip",
             relative_path_to_binaries: "bin/windows-x64/release/",
             static_libs: &["slang"],
         };
     } else if #[cfg(all(target_os = "linux", target_arch = "x86_64"))] {
         const SLANG_RELEASE: SlangReleaseInfo = SlangReleaseInfo {
-            url: "https://github.com/shader-slang/slang/releases/download/v0.12.4/slang-0.12.4-linux-x86_64.zip",
+            url: "https://github.com/shader-slang/slang/releases/download/v0.12.6/slang-0.12.6-linux-x86_64.zip",
             relative_path_to_binaries: "bin/linux-x64/release/",
             static_libs: &[],
         };
     } else {
-        compile_error!("No official release for the current platform! See: https://github.com/shader-slang/slang/releases/tag/v0.12.4");
+        compile_error!("No official release for the current platform! See: https://github.com/shader-slang/slang/releases/tag/v0.12.6");
     }
 }
 

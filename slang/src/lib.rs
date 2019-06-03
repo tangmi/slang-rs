@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 #![warn(clippy::all)]
-#![warn(clippy::pedantic)]
+// #![warn(clippy::pedantic)]
 
 use slang_sys::*;
 use std::ffi::CStr;
@@ -90,39 +90,124 @@ impl Drop for Session<'_> {
     }
 }
 
+type DiagnosticCallback = unsafe extern "C" fn(
+    message: *const ::std::os::raw::c_char,
+    user_data: *mut ::std::os::raw::c_void,
+);
+
 lifetime_wrapper_struct_copy!(CodeGenTarget, i32);
 lifetime_wrapper_struct_copy!(TranslationUnitIndex, i32);
 lifetime_wrapper_struct_copy!(EntryPointIndex, i32);
 
 lifetime_wrapper_struct!(CompileRequest, *mut SlangCompileRequest);
 
+// TODO there's got to be a better API shape that helps inform of usage... builder pattern maybe?
 impl<'a> CompileRequest<'a> {
     // pub fn set_file_system(&self, ISlangFileSystem* fileSystem) {}
-    // pub fn set_compile_flags(&self, SlangCompileFlags flags) {}
-    // pub fn set_dump_intermediates(&self, int enable) {}
-    // pub fn set_line_directive_mode(&self, SlangLineDirectiveMode mode) {}
-    // pub fn set_code_gen_target(&self, SlangCompileTarget target) {}
+
+    pub fn set_compile_flags(&self, flags: CompileFlags) {
+        unsafe {
+            spSetCompileFlags(self.get(), flags.bits() as u32);
+        }
+    }
+
+    pub fn set_dump_intermediates(&self, enable: bool) {
+        unsafe {
+            spSetDumpIntermediates(self.get(), if enable { 1 } else { 0 });
+        }
+    }
+
+    pub fn set_line_directive_mode(&self, mode: LineDirectiveMode) {
+        unsafe {
+            spSetLineDirectiveMode(self.get(), mode as u32);
+        }
+    }
+
+    pub fn set_code_gen_target(&self, target: CodeGenTarget) {
+        unsafe {
+            spSetCodeGenTarget(self.get(), target.get());
+        }
+    }
 
     pub fn add_code_gen_target(&self, target: CompileTarget) -> CodeGenTarget {
         unsafe { spAddCodeGenTarget(self.get(), target as SlangCompileTarget).into() }
     }
 
     pub fn set_target_profile(&self, target_index: CodeGenTarget, profile: ProfileId) {
-        unsafe { spSetTargetProfile(self.get(), target_index.get(), profile.get()) }
+        unsafe {
+            spSetTargetProfile(self.get(), target_index.get(), profile.get());
+        }
     }
 
-    // pub fn set_target_flags(&self, target_index: CodeGenTarget, SlangTargetFlags flags) {}
-    // pub fn set_target_floating_point_mode(&self, target_index: CodeGenTarget, SlangFloatingPointMode mode) {}
-    // pub fn set_target_matrix_layout_mode(&self, target_index: CodeGenTarget, SlangMatrixLayoutMode mode) {}
-    // pub fn set_matrix_layout_mode(&self, SlangMatrixLayoutMode mode) {}
-    // pub fn set_output_container_format(&self, SlangContainerFormat format) {}
-    // pub fn set_pass_through(&self, SlangPassThrough passThrough) {}
-    // pub fn set_diagnostic_callback(&self, SlangDiagnosticCallback callback, void const* userData) {}
-    // pub fn set_writer(&self, SlangWriterChannel channel, ISlangWriter* writer) {}
-    // pub fn get_writer(&self, SlangWriterChannel channel) -> ISlangWriter*  {}
-    // pub fn add_search_path(&self, const char* searchDir) {}
-    // pub fn add_preprocessor_define(&self, const char* key, const char* value) {}
-    // pub fn process_command_line_arguments(&self, cstr const* args, int argCount) -> SlangResult  {}
+    pub fn set_target_flags(&self, target_index: CodeGenTarget, flags: TargetFlags) {
+        unsafe {
+            spSetTargetFlags(self.get(), target_index.get(), flags.bits() as u32);
+        }
+    }
+
+    pub fn set_target_floating_point_mode(
+        &self,
+        target_index: CodeGenTarget,
+        mode: FloatingPointMode,
+    ) {
+        unsafe {
+            spSetTargetFloatingPointMode(self.get(), target_index.get(), mode as u32);
+        }
+    }
+
+    pub fn set_target_matrix_layout_mode(
+        &self,
+        target_index: CodeGenTarget,
+        mode: MatrixLayoutMode,
+    ) {
+        unsafe {
+            spSetTargetMatrixLayoutMode(self.get(), target_index.get(), mode as u32);
+        }
+    }
+
+    pub fn set_matrix_layout_mode(&self, mode: MatrixLayoutMode) {
+        unsafe {
+            spSetMatrixLayoutMode(self.get(), mode as u32);
+        }
+    }
+
+    pub fn set_output_container_format(&self, format: ContainerFormat) {
+        unsafe {
+            spSetOutputContainerFormat(self.get(), format as i32);
+        }
+    }
+
+    pub fn set_pass_through(&self, pass_through: PassThrough) {
+        unsafe {
+            spSetPassThrough(self.get(), pass_through as i32);
+        }
+    }
+
+    // TODO: is there a better way of getting a callback passed in? thread local `unsafe extern "c"` that rust assigns to before each call?
+    pub unsafe fn set_diagnostic_callback(
+        &self,
+        callback: DiagnosticCallback,
+        user_data: *mut std::ffi::c_void,
+    ) {
+        spSetDiagnosticCallback(self.get(), Some(callback), user_data);
+    }
+
+    // pub fn set_writer(&self,  channel:WriterChannel, ISlangWriter* writer) {unsafe { spSetWriter(self.get(),  channel:WriterChannel, ISlangWriter* writer); } }
+    // pub fn get_writer(&self,  channel:WriterChannel) -> ISlangWriter*  {unsafe { spGetWriter(self.get(),  channel:WriterChannel) -> ISlangWriter* ; } }
+
+    pub fn add_search_path(&self, search_dir: impl AsRef<CStr>) {
+        unsafe {
+            spAddSearchPath(self.get(), search_dir.as_ref().as_ptr());
+        }
+    }
+
+    pub fn add_preprocessor_define(&self, key: impl AsRef<CStr>, value: impl AsRef<CStr>) {
+        unsafe {
+            spAddPreprocessorDefine(self.get(), key.as_ref().as_ptr(), value.as_ref().as_ptr());
+        }
+    }
+
+    // pub fn process_command_line_arguments(&self, cstr const* args, int argCount) -> SlangResult  { unsafe { spProcessCommandLineArguments(self.get(), cstr const* args, int argCount) } }
 
     pub fn add_translation_unit(
         &self,
@@ -139,7 +224,22 @@ impl<'a> CompileRequest<'a> {
         }
     }
 
-    // pub fn translation_unit_add_preprocessor_define(&self, translation_unit_index: TranslationUnitIndex, const char* key, const char* value) {}
+    pub fn translation_unit_add_preprocessor_define(
+        &self,
+        translation_unit_index: TranslationUnitIndex,
+        key: impl AsRef<CStr>,
+        value: impl AsRef<CStr>,
+    ) {
+        unsafe {
+            spTranslationUnit_addPreprocessorDefine(
+                self.get(),
+                translation_unit_index.get(),
+                key.as_ref().as_ptr(),
+                value.as_ref().as_ptr(),
+            );
+        }
+    }
+
     // pub fn add_translation_unit_source_file(&self, translation_unit_index: TranslationUnitIndex, cstr path) {}
 
     pub fn add_translation_unit_source_string(
@@ -154,7 +254,7 @@ impl<'a> CompileRequest<'a> {
                 translation_unit_index.get(),
                 path.as_ref().as_ptr(),
                 source.as_ref().as_ptr(),
-            )
+            );
         }
     }
 
@@ -178,7 +278,33 @@ impl<'a> CompileRequest<'a> {
         }
     }
 
-    // pub fn add_entry_point_ex(&self, translation_unit_index: TranslationUnitIndex, cstr name, SlangStage stage, int genericTypeNameCount, cstr* genericTypeNames) -> int  {}
+    pub fn add_entry_point_ex(
+        &self,
+        translation_unit_index: TranslationUnitIndex,
+        name: impl AsRef<CStr>,
+        stage: Stage,
+        generic_type_names: &[&CStr],
+    ) -> EntryPointIndex {
+        unsafe {
+            let mut generic_type_names_ptrs = generic_type_names
+                .iter()
+                .map(|a| a.as_ptr())
+                .collect::<Vec<_>>();
+
+            dbg!(&generic_type_names);
+            dbg!(&generic_type_names_ptrs);
+
+            spAddEntryPointEx(
+                self.get(),
+                translation_unit_index.get(),
+                name.as_ref().as_ptr(),
+                stage as SlangStage,
+                generic_type_names.len() as i32,
+                &mut generic_type_names_ptrs[0],
+            )
+            .into()
+        }
+    }
 
     pub fn compile(&self) -> Result<()> {
         unsafe { into_result(spCompile(self.get())) }
@@ -189,10 +315,21 @@ impl<'a> CompileRequest<'a> {
     }
 
     // pub fn get_diagnostic_output_blob(&self, ISlangBlob** outBlob) -> SlangResult  {}
-    // pub fn get_dependency_file_count(&self) -> int  {}
-    // pub fn get_dependency_file_path(&self, int index) -> cstr  {}
-    // pub fn get_translation_unit_count(&self) -> int  {}
-    // pub fn get_entry_point_source(&self,  entry_point_index: EntryPointIndex) -> cstr  {}
+    pub fn get_dependency_file_count(&self) -> usize {
+        unsafe { spGetDependencyFileCount(self.get()) as usize }
+    }
+
+    pub fn get_dependency_file_path(&self, index: usize) -> &'a CStr {
+        unsafe { CStr::from_ptr(spGetDependencyFilePath(self.get(), index as i32)) }
+    }
+
+    pub fn get_translation_unit_count(&self) -> usize {
+        unsafe { spGetTranslationUnitCount(self.get()) as usize }
+    }
+
+    pub fn get_entry_point_source(&self, entry_point_index: EntryPointIndex) -> &'a CStr {
+        unsafe { CStr::from_ptr(spGetEntryPointSource(self.get(), entry_point_index.get())) }
+    }
 
     pub fn get_entry_point_code(&self, entry_point_index: EntryPointIndex) -> &'a [u8] {
         unsafe {

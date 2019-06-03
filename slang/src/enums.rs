@@ -1,3 +1,5 @@
+use bitflags::bitflags;
+
 // NOTE: These need to be kept up-to-date with the enums in `slang.h`.
 // TODO: Is there a way to automatically generate these with `bindgen`?
 
@@ -49,19 +51,19 @@ pub enum PassThrough {
     Glslang = slang_sys::SLANG_PASS_THROUGH_GLSLANG,
 }
 
-#[allow(clippy::pub_enum_variant_names)]
-#[repr(i32)]
-pub enum CompileFlags {
-    NoMangling = slang_sys::SLANG_COMPILE_FLAG_NO_MANGLING,
-    NoCodegen = slang_sys::SLANG_COMPILE_FLAG_NO_CODEGEN,
-    NoChecking = slang_sys::SLANG_COMPILE_FLAG_NO_CHECKING,
-    // SplitMixedTypes = slang_sys::SLANG_COMPILE_FLAG_SPLIT_MIXED_TYPES, // redef of 0?
+bitflags! {
+    pub struct CompileFlags: i32 {
+        const NO_MANGLING = slang_sys::SLANG_COMPILE_FLAG_NO_MANGLING;
+        const NO_CODEGEN = slang_sys::SLANG_COMPILE_FLAG_NO_CODEGEN;
+        const NO_CHECKING = slang_sys::SLANG_COMPILE_FLAG_NO_CHECKING;
+        const SPLIT_MIXED_TYPES = slang_sys::SLANG_COMPILE_FLAG_SPLIT_MIXED_TYPES;
+    }
 }
 
-#[repr(i32)]
-pub enum TargetFlags {
-    ParameterBlocksUseRegisterSpaces =
-        slang_sys::SLANG_TARGET_FLAG_PARAMETER_BLOCKS_USE_REGISTER_SPACES,
+bitflags! {
+    pub struct TargetFlags: i32 {
+        const PARAMETER_BLOCKS_USE_REGISTER_SPACES = slang_sys::SLANG_TARGET_FLAG_PARAMETER_BLOCKS_USE_REGISTER_SPACES;
+    }
 }
 
 #[repr(i32)]
@@ -86,12 +88,6 @@ pub enum SourceLanguage {
     Hlsl = slang_sys::SLANG_SOURCE_LANGUAGE_HLSL,
     Glsl = slang_sys::SLANG_SOURCE_LANGUAGE_GLSL,
 }
-
-// Handled with the ProfileID typedef in `lib`
-// #[repr(i32)]
-// pub enum ProfileID {
-//     Unknown = slang_sys::SLANG_PROFILE_UNKNOWN,
-// }
 
 #[repr(i32)]
 pub enum MatrixLayoutMode {
