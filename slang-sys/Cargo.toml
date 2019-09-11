@@ -11,9 +11,19 @@ description = "FFI bindings to slang"
 readme = "README.md"
 edition = "2018"
 
+[features]
+# Build slang from source, even if a pre-compiled release exists.
+# Note this is only valid when the build tools (slang-binary's premake5) are available.
+# They are currently available on `linux-64`, `osx`, and `windows-x64`.
+from-source = ["git2"]
+
 [build-dependencies]
 bindgen = "0.48"
 cfg-if = "0.1"
 curl = "0.4"
 url = "1.7"
 zip = "0.5"
+git2 = { version = "0.10", optional = true }
+
+[target.'not(any(all(target_os = "windows", target_arch = "x86"), all(target_os = "windows", target_arch = "x86_64"), all(target_os = "linux", target_arch = "x86_64")))'.dependencies]
+git2 = { version = "0.10" }

@@ -86,7 +86,7 @@ impl ShaderPipeline {
         #[cfg(windows)]
         let selector = BackendSelector {
             profile: "sm_4_0",
-            target: slang::CompileTarget::Dxbc,
+            target: slang::CompileTarget::Hlsl,
             backend: Backend::HlslSm40,
         };
 

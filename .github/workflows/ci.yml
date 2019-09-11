@@ -3,6 +3,9 @@ name: Rust
 on: [push]
 
 jobs:
+  # todo formatting/linter checks
+
+  # TODO this is intended to make sure we can build and access the binary on all platforms
   build:
     name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
