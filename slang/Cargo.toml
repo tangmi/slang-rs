@@ -11,4 +11,4 @@ edition = "2018"
 
 [dependencies]
 slang-sys = { path = "../slang-sys", version = "0.1" }
-bitflags = "1.0"
+bitflags = "1"

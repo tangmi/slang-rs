@@ -12,8 +12,8 @@ readme = "README.md"
 edition = "2018"
 
 [build-dependencies]
-bindgen = "0.48"
+bindgen = "0.52"
 cfg-if = "0.1"
 curl = "0.4"
-url = "1.7"
+url = "2"
 zip = "0.5"

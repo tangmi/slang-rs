@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 slang = { version = "0.0", path = "../slang" }
-spirv_cross = "0.12"
+spirv_cross = "0.16"
 gfx = "0.18"
